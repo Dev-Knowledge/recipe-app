@@ -1,37 +1,47 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import Header from "./Header";
+import Category from "./Category";
+import Bestmeals from "./Bestmeals";
+import { Link } from "react-router-dom";
 
 const Home = () => {
-  const [query, setQuery] = useState("a");
-  const [recipes, setRecipes] = useState([]);
+  const [meal, setMeal] = useState("");
 
-  const handelSubmit = (e) => {
-    e.preventDefault();
-
-    //search recipe on submit
-    fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${query}`)
+  useEffect(() => {
+    fetch("https://www.themealdb.com/api/json/v1/1/random.php")
       .then((res) => res.json())
-      .then((data) => console.log(data.meals))
-      .catch((error) => console.log(error.message));
-  };
-
+      .then((data) => setMeal(data.meals[0]));
+  }, []);
   return (
-    <section>
-      <form className="text-center py-10" onSubmit={handelSubmit}>
-        <input
-          className="border-2 p-5"
-          type="text"
-          placeholder="Serch recipe here..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <button
-          className="px-8 py-5 bg-green-500 text-white border-2"
-          type="submit"
-        >
-          Search
-        </button>
-      </form>
-    </section>
+    <>
+      <Header />
+
+      <section className="h-screen flex flex-col justify-between items-center gap-2 px-24 ">
+        <div className="h-screen flex justify-between items-center py-4 gap-2 px-24">
+          <article className="flex flex-col gap-5 justify-between w-1/2">
+            <h2 className="text-xl font-normal">Random Recipe of the Day</h2>
+            <h3 className="text-[60px] font-bold leading-[60px]">
+              {meal.strMeal}
+            </h3>
+            <p className="text-xl font-normal">Recipe From {meal.strArea}</p>
+            <button className="w-fit px-3 py-2 bg-orange-300 rounded-3xl">
+              <Link to="/recipe-app/recipeDetails" state={meal.idMeal}>
+                Get Details
+              </Link>
+            </button>
+          </article>
+          <article className="w-1/2">
+            <img
+              src={meal.strMealThumb}
+              alt={meal.strMeal}
+              className="rounded-3xl shadow-lg"
+            />
+          </article>
+        </div>
+        <Category />
+        <Bestmeals />
+      </section>
+    </>
   );
 };
 
